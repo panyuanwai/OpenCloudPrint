@@ -7,6 +7,7 @@ services:
     container_name: ocp_mysql
     restart: unless-stopped
     environment:
+      TZ: Asia/Shanghai
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-ocp_root_pass}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-ocp_db}
       MYSQL_USER: ${MYSQL_USER:-ocp_user}
@@ -31,6 +32,8 @@ services:
     restart: unless-stopped
     ports:
       - "${REDIS_PORT:-6379}:6379"
+    environment:
+      TZ: Asia/Shanghai
     command: redis-server --requirepass ${REDIS_PASSWORD:-redis_pass}
     volumes:
       - redis_data:/data
@@ -50,9 +53,12 @@ services:
     ports:
       - "${MQTT_PORT:-1883}:1883"
       - "${MQTT_WS_PORT:-9001}:9001"
+    environment:
+      TZ: Asia/Shanghai
     volumes:
       - ./docker/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
-      - ./docker/mosquitto/passwd:/mosquitto/config/passwd:ro
+      # 【修改点】暂时注释掉密码文件挂载，配合配置文件中的匿名访问
+      # - ./docker/mosquitto/passwd:/mosquitto/config/passwd:ro
       - mqtt_data:/mosquitto/data
       - mqtt_logs:/mosquitto/log
     networks:
@@ -68,6 +74,7 @@ services:
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     environment:
+      TZ: Asia/Shanghai
       # 数据库配置
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
@@ -125,6 +132,7 @@ services:
     container_name: ocp_celery_worker
     restart: unless-stopped
     environment:
+      TZ: Asia/Shanghai
       # Redis 配置 (作为 Celery broker)
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -168,6 +176,7 @@ services:
     container_name: ocp_celery_beat
     restart: unless-stopped
     environment:
+      TZ: Asia/Shanghai
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_pass}
@@ -188,6 +197,7 @@ services:
     ports:
       - "${FLOWER_PORT:-5555}:5555"
     environment:
+      TZ: Asia/Shanghai
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_pass}
